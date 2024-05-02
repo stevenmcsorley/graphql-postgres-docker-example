@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Companies Data</title>
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <div id="companiesData" class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"></div>
+    </div>
+
+    <script>
+        // Make a request to your GraphQL server
+        fetch('http://localhost:4001', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: `
+                query {
+                    companies {
+                        CompanyId
+                        Name
+                        Address
+                        ContactPerson
+                        employees {
+                            EmployeeId
+                            FirstName
+                            LastName
+                            Role
+                        }
+                        resources {
+                            ResourceId
+                            Identifier
+                            Type
+                            Capacity
+                            assignments {
+                                AssignmentId
+                                StartTime
+                                EndTime
+                                Status
+                            }
+                        }
+                    }
+                }
+            ` }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Process the data and display it on the HTML page
+            const companiesData = data.data.companies;
+            const companiesElement = document.getElementById('companiesData');
+            
+            companiesData.forEach(company => {
+                const companyDiv = document.createElement('div');
+                companyDiv.className = 'bg-white rounded shadow p-6';
+                companyDiv.innerHTML = `
+                    <h2 class="text-xl font-bold mb-2">${company.Name}</h2>
+                    <p><strong>Company ID:</strong> ${company.CompanyId}</p>
+                    <p><strong>Address:</strong> ${company.Address}</p>
+                    <p><strong>Contact Person:</strong> ${company.ContactPerson}</p>
+                    <h3 class="mt-4 mb-2 text-lg font-semibold">Employees:</h3>
+                    <ul class="list-disc ml-6">
+                        ${company.employees.map(employee => `
+                            <li>
+                                <strong>${employee.FirstName} ${employee.LastName}</strong> - ${employee.Role}
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <h3 class="mt-4 mb-2 text-lg font-semibold">Resources:</h3>
+                    <ul class="list-disc ml-6">
+                        ${company.resources.map(resource => `
+                            <li>
+                                <strong>${resource.Identifier}</strong> (${resource.Type}) - Capacity: ${resource.Capacity}
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                companiesElement.appendChild(companyDiv);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
