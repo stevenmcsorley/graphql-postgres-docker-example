@@ -11,13 +11,15 @@ This is a simple example project demonstrating how to set up a GraphQL server us
 Clone this repository to your local machine:
 
 ```bash
-git clone <repository_url>
+git clone https://github.com/stevenmcsorley/graphql-postgres-docker-example
 ```
 
 Start the Docker containers using Docker Compose:
 
 docker-compose up
 
+Db will be created and populated
+by the scripts in postgres-init
 
 Once the containers are up and running, you can access the GraphQL Playground at http://localhost:4001 to run GraphQL queries.
 Example Query
